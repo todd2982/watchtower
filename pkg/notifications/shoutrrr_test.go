@@ -3,7 +3,7 @@ package notifications
 import (
 	"time"
 
-	"github.com/todd2982/shoutrrr/pkg/types"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/todd2982/watchtower/internal/actions/mocks"
 	"github.com/todd2982/watchtower/internal/flags"
 	s "github.com/todd2982/watchtower/pkg/session"

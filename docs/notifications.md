@@ -24,7 +24,7 @@ system, [logrus](http://github.com/sirupsen/logrus).
 -   `--notification-skip-title` (env. `WATCHTOWER_NOTIFICATION_SKIP_TITLE`): Do not pass the title param to notifications. This will not pass a dynamic title override to notification services. If no title is configured for the service, it will remove the title all together.
 -   `--notification-log-stdout` (env. `WATCHTOWER_NOTIFICATION_LOG_STDOUT`): Enable output from `logger://` shoutrrr service to stdout.
 
-## [Shoutrrr](https://github.com/todd2982/shoutrrr) notifications
+## [Shoutrrr](https://github.com/containrrr/shoutrrr) notifications
 
 To send notifications via shoutrrr, the following command-line options, or their corresponding environment variables, can be set:
 
