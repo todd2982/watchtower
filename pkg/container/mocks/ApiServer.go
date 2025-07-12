@@ -3,14 +3,15 @@ package mocks
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/onsi/ginkgo"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
-	t "github.com/todd2982/watchtower/pkg/types"
+	"github.com/onsi/ginkgo"
+
+	t "github.com/containrrr/watchtower/pkg/types"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"

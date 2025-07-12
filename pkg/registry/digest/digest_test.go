@@ -2,16 +2,17 @@ package digest_test
 
 import (
 	"fmt"
-	"github.com/todd2982/watchtower/internal/actions/mocks"
-	"github.com/todd2982/watchtower/pkg/registry/digest"
-	wtTypes "github.com/todd2982/watchtower/pkg/types"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/ghttp"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/containrrr/watchtower/pkg/registry/digest"
+	wtTypes "github.com/containrrr/watchtower/pkg/types"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
+	"github.com/todd2982/watchtower/internal/actions/mocks"
 )
 
 func TestDigest(t *testing.T) {

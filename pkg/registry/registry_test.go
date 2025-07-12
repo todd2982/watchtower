@@ -1,10 +1,10 @@
 package registry_test
 
 import (
-	"github.com/todd2982/watchtower/internal/actions/mocks"
-	unit "github.com/todd2982/watchtower/pkg/registry"
+	unit "github.com/containrrr/watchtower/pkg/registry"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/todd2982/watchtower/internal/actions/mocks"
 
 	"time"
 )

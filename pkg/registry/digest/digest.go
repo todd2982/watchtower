@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/todd2982/watchtower/internal/meta"
-	"github.com/todd2982/watchtower/pkg/registry/auth"
-	"github.com/todd2982/watchtower/pkg/registry/manifest"
-	"github.com/todd2982/watchtower/pkg/types"
+	"github.com/containrrr/watchtower/pkg/registry/auth"
+	"github.com/containrrr/watchtower/pkg/registry/manifest"
+	"github.com/containrrr/watchtower/pkg/types"
 	"github.com/sirupsen/logrus"
+	"github.com/todd2982/watchtower/internal/meta"
 )
 
 // ContentDigestHeader is the key for the key-value pair containing the digest header

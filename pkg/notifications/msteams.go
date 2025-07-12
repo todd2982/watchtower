@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	shoutrrrTeams "github.com/containrrr/shoutrrr/pkg/services/teams"
-	t "github.com/todd2982/watchtower/pkg/types"
+	t "github.com/containrrr/watchtower/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

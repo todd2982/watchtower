@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/todd2982/watchtower/pkg/types"
+	"github.com/containrrr/watchtower/pkg/types"
 )
 
 // Progress contains the current session container status

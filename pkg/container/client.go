@@ -15,9 +15,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
-	"github.com/todd2982/watchtower/pkg/registry"
-	"github.com/todd2982/watchtower/pkg/registry/digest"
-	t "github.com/todd2982/watchtower/pkg/types"
+	"github.com/containrrr/watchtower/pkg/registry"
+	"github.com/containrrr/watchtower/pkg/registry/digest"
+	t "github.com/containrrr/watchtower/pkg/types"
 )
 
 const defaultStopSignal = "SIGTERM"
