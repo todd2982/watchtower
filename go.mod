@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/containrrr/shoutrrr v0.8.0
+	github.com/containrrr/watchtower v1.7.1
 	github.com/distribution/reference v0.5.0
 	github.com/docker/cli v28.3.2+incompatible
 	github.com/docker/docker v28.3.2+incompatible
@@ -79,5 +80,4 @@ require (
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gotest.tools/v3 v3.0.3 // indirect
 )
