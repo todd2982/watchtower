@@ -9,7 +9,7 @@ require (
 	github.com/docker/docker v28.3.2+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.30.0
+	github.com/onsi/gomega v1.37.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
@@ -50,7 +50,6 @@ require (
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
