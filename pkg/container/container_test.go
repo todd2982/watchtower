@@ -1,7 +1,7 @@
 package container
 
 import (
-	"github.com/containrrr/watchtower/pkg/types"
+	"github.com/todd2982/watchtower/pkg/types"
 	dc "github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	. "github.com/onsi/ginkgo"
@@ -165,7 +165,7 @@ var _ = Describe("the container", func() {
 		})
 		It("should return its name on calls to .Name()", func() {
 			name := c.Name()
-			Expect(name).To(Equal("test-containrrr"))
+			Expect(name).To(Equal("test-todd2982"))
 			Expect(name).NotTo(Equal("wrong-name"))
 		})
 		It("should return its ID on calls to .ID()", func() {
@@ -294,8 +294,8 @@ var _ = Describe("the container", func() {
 			When("the depends on label is not present", func() {
 				It("should fetch depending containers from host config links", func() {
 					c = MockContainer(WithLinks([]string{
-						"redis:test-containrrr",
-						"postgres:test-containrrr",
+						"redis:test-todd2982",
+						"postgres:test-todd2982",
 					}))
 					links := c.Links()
 					Expect(links).To(SatisfyAll(ContainElement("redis"), ContainElement("postgres"), HaveLen(2)))

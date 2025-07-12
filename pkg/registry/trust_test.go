@@ -13,10 +13,10 @@ var _ = Describe("Registry credential helpers", func() {
 			var err error
 			expected := "eyJ1c2VybmFtZSI6ImNvbnRhaW5ycnItdXNlciIsInBhc3N3b3JkIjoiY29udGFpbnJyci1wYXNzIn0="
 
-			err = os.Setenv("REPO_USER", "containrrr-user")
+			err = os.Setenv("REPO_USER", "todd2982-user")
 			Expect(err).NotTo(HaveOccurred())
 
-			err = os.Setenv("REPO_PASS", "containrrr-pass")
+			err = os.Setenv("REPO_PASS", "todd2982-pass")
 			Expect(err).NotTo(HaveOccurred())
 
 			config, err := EncodedEnvAuth()

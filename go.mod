@@ -1,9 +1,9 @@
-module github.com/containrrr/watchtower
+module github.com/todd2982/watchtower
 
 go 1.23
 
 require (
-	github.com/containrrr/shoutrrr v0.8.0
+	github.com/todd2982/shoutrrr v0.8.0
 	github.com/distribution/reference v0.5.0
 	github.com/docker/cli v24.0.7+incompatible
 	github.com/docker/docker v25.0.6+incompatible

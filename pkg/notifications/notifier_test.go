@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/containrrr/watchtower/cmd"
-	"github.com/containrrr/watchtower/internal/flags"
-	"github.com/containrrr/watchtower/pkg/notifications"
+	"github.com/todd2982/watchtower/cmd"
+	"github.com/todd2982/watchtower/internal/flags"
+	"github.com/todd2982/watchtower/pkg/notifications"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -146,8 +146,8 @@ var _ = Describe("notifications", func() {
 			channel := "123456789"
 			token := "abvsihdbau"
 			color := notifications.ColorInt
-			username := "containrrrbot"
-			iconURL := "https://containrrr.dev/watchtower-sq180.png"
+			username := "todd2982bot"
+			iconURL := "https://todd2982.dev/watchtower-sq180.png"
 			expected := fmt.Sprintf("discord://%s@%s?color=0x%x&colordebug=0x0&colorerror=0x0&colorinfo=0x0&colorwarn=0x0&username=watchtower", token, channel, color)
 			buildArgs := func(url string) []string {
 				return []string{
@@ -191,12 +191,12 @@ var _ = Describe("notifications", func() {
 		When("converting a slack service config into a shoutrrr url", func() {
 			command := cmd.NewRootCommand()
 			flags.RegisterNotificationFlags(command)
-			username := "containrrrbot"
+			username := "todd2982bot"
 			tokenA := "AAAAAAAAA"
 			tokenB := "BBBBBBBBB"
 			tokenC := "123456789123456789123456"
 			color := url.QueryEscape(notifications.ColorHex)
-			iconURL := "https://containrrr.dev/watchtower-sq180.png"
+			iconURL := "https://todd2982.dev/watchtower-sq180.png"
 			iconEmoji := "whale"
 
 			When("icon URL is specified", func() {
@@ -300,7 +300,7 @@ var _ = Describe("notifications", func() {
 		When("converting an email service config into a shoutrrr url", func() {
 			It("should set the from address in the URL", func() {
 				fromAddress := "lala@example.com"
-				expectedOutput := buildExpectedURL("containrrrbot", "secret-password", "mail.containrrr.dev", 25, fromAddress, "mail@example.com", "Plain")
+				expectedOutput := buildExpectedURL("todd2982bot", "secret-password", "mail.todd2982.dev", 25, fromAddress, "mail@example.com", "Plain")
 				expectedDelay := time.Duration(7) * time.Second
 
 				args := []string{
@@ -311,11 +311,11 @@ var _ = Describe("notifications", func() {
 					"--notification-email-to",
 					"mail@example.com",
 					"--notification-email-server-user",
-					"containrrrbot",
+					"todd2982bot",
 					"--notification-email-server-password",
 					"secret-password",
 					"--notification-email-server",
-					"mail.containrrr.dev",
+					"mail.todd2982.dev",
 					"--notifications-delay",
 					fmt.Sprint(expectedDelay.Seconds()),
 				}
@@ -326,7 +326,7 @@ var _ = Describe("notifications", func() {
 
 				fromAddress := "sender@example.com"
 				toAddress := "receiver@example.com"
-				expectedOutput := buildExpectedURL("containrrrbot", "secret-password", "mail.containrrr.dev", 25, fromAddress, toAddress, "Plain")
+				expectedOutput := buildExpectedURL("todd2982bot", "secret-password", "mail.todd2982.dev", 25, fromAddress, toAddress, "Plain")
 				expectedDelay := time.Duration(7) * time.Second
 
 				args := []string{
@@ -337,11 +337,11 @@ var _ = Describe("notifications", func() {
 					"--notification-email-to",
 					toAddress,
 					"--notification-email-server-user",
-					"containrrrbot",
+					"todd2982bot",
 					"--notification-email-server-password",
 					"secret-password",
 					"--notification-email-server",
-					"mail.containrrr.dev",
+					"mail.todd2982.dev",
 					"--notification-email-delay",
 					fmt.Sprint(expectedDelay.Seconds()),
 				}

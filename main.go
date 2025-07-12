@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/containrrr/watchtower/cmd"
+	"github.com/todd2982/watchtower/cmd"
 	log "github.com/sirupsen/logrus"
 )
 
