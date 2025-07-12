@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.23.x
-      - uses: dominikh/staticcheck-action@ba605356b4b29a60e87ab9404b712f3461e566dc #v1.3.0
+      - uses: dominikh/staticcheck-action@v1
         with:
           version: "2022.1.1"
           install-go: "false" # StaticCheck uses go v1.17 which does not support `any`
