@@ -11,6 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/containrrr/watchtower/internal/actions"
+	"github.com/containrrr/watchtower/internal/flags"
+	"github.com/containrrr/watchtower/internal/meta"
 	"github.com/containrrr/watchtower/pkg/api"
 	apiMetrics "github.com/containrrr/watchtower/pkg/api/metrics"
 	"github.com/containrrr/watchtower/pkg/api/update"
@@ -21,9 +24,6 @@ import (
 	t "github.com/containrrr/watchtower/pkg/types"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
-	"github.com/todd2982/watchtower/internal/actions"
-	"github.com/todd2982/watchtower/internal/flags"
-	"github.com/todd2982/watchtower/internal/meta"
 
 	"github.com/spf13/cobra"
 )

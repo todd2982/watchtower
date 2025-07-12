@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containrrr/watchtower/internal/actions/mocks"
 	"github.com/containrrr/watchtower/pkg/registry/auth"
-	"github.com/todd2982/watchtower/internal/actions/mocks"
 
 	wtTypes "github.com/containrrr/watchtower/pkg/types"
 	ref "github.com/distribution/reference"

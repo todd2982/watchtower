@@ -4,14 +4,14 @@ import (
 	"time"
 
 	"github.com/containrrr/shoutrrr/pkg/types"
+	"github.com/containrrr/watchtower/internal/actions/mocks"
+	"github.com/containrrr/watchtower/internal/flags"
 	s "github.com/containrrr/watchtower/pkg/session"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/todd2982/watchtower/internal/actions/mocks"
-	"github.com/todd2982/watchtower/internal/flags"
 )
 
 var allButTrace = logrus.DebugLevel
