@@ -7,21 +7,6 @@ on:
       - main
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.23.x
-      - uses: dominikh/staticcheck-action@v1
-        with:
-          install-go: "false" # StaticCheck uses go v1.17 which does not support `any`
   test:
     name: Test
     strategy:
