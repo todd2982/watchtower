@@ -61,9 +61,9 @@ jobs:
           password: ${{ secrets.BOT_GHCR_PAT }}
           registry: ghcr.io
       - name: Build
-        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 #v3
+        uses: goreleaser/goreleaser-action@v6
         with:
-          version: v0.155.0
+          version: '~> v2'
           args: --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -165,13 +165,13 @@ jobs:
       #       docker manifest push ghcr.io/todd2982/watchtower:$(echo $TAG | sed 's/^v*//') && \
       #       docker manifest push ghcr.io/todd2982/watchtower:latest
 
-  renew-docs:
-    name: Refresh pkg.go.dev
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Pull new module version
-      uses: andrewslotin/go-proxy-pull-action@0ef95ea50ab6c03f2f095a5102bbdecad8fd7602 #master@2022-10-14
+  # renew-docs:
+  #   name: Refresh pkg.go.dev
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Pull new module version
+  #     uses: andrewslotin/go-proxy-pull-action@0ef95ea50ab6c03f2f095a5102bbdecad8fd7602 #master@2022-10-14
 
   
   
