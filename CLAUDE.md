@@ -160,7 +160,6 @@ Access the version using `internal/meta.Version` - do not hardcode version strin
 - **`.github/workflows/release-dev.yaml`** - Development releases
 - **`.github/workflows/publish-docs.yml`** - MkDocs documentation deployment
 - **`.github/workflows/pull-request.yml`** - PR validation and testing
-- **`.github/workflows/codeql-analysis.yml`** - Security scanning
 
 ### Release Process
 
