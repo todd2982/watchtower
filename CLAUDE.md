@@ -158,7 +158,6 @@ Access the version using `internal/meta.Version` - do not hardcode version strin
   - Docker images published to Docker Hub and GHCR
   - Uses goreleaser for build orchestration
 - **`.github/workflows/release-dev.yaml`** - Development releases
-- **`.github/workflows/publish-docs.yml`** - MkDocs documentation deployment
 - **`.github/workflows/pull-request.yml`** - PR validation and testing
 
 ### Release Process
