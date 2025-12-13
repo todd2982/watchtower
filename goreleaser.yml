@@ -1,28 +1,32 @@
 version: 2
-build:
-  main: ./main.go
-  binary: watchtower
-  goos:
-    - linux
-    - windows
-  goarch:
-    - amd64
-    - 386
-    - arm
-    - arm64
-  ldflags:
-    - -s -w -X github.com/containrrr/watchtower/internal/meta.Version={{.Version}}
+builds:
+  - id: watchtower
+    main: ./main.go
+    binary: watchtower
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    ldflags:
+      - -s -w -X github.com/containrrr/watchtower/internal/meta.Version={{.Version}}
 archives:
-  - 
-    name_template: "{{.ProjectName}}_{{.Os}}_{{.Arch}}"
+  -
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- if eq .Os "darwin" }}macOS
+      {{- else if eq .Os "linux" }}linux
+      {{- else if eq .Os "windows" }}windows
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}386
+      {{- else if eq .Arch "arm" }}armhf
+      {{- else if eq .Arch "arm64" }}arm64v8
+      {{- else }}{{ .Arch }}{{ end }}
     format: tar.gz
-    replacements:
-      arm: armhf
-      arm64: arm64v8
-      amd64: amd64
-      386: 386
-      darwin: macOS
-      linux: linux
     format_overrides:
       - goos: windows
         format: zip
@@ -30,7 +34,8 @@ archives:
       - LICENSE.md
 dockers:
   -
-    use_buildx: true
+    ids:
+      - watchtower
     build_flag_templates: [ "--platform=linux/amd64" ]
     goos: linux
     goarch: amd64
@@ -41,10 +46,9 @@ dockers:
       - todd2982/watchtower:amd64-latest
       - ghcr.io/todd2982/watchtower:amd64-{{ .Version }}
       - ghcr.io/todd2982/watchtower:amd64-latest
-    binaries:
+  -
+    ids:
       - watchtower
-  - 
-    use_buildx: true
     build_flag_templates: [ "--platform=linux/386" ]
     goos: linux
     goarch: 386
@@ -55,10 +59,9 @@ dockers:
       - todd2982/watchtower:i386-latest
       - ghcr.io/todd2982/watchtower:i386-{{ .Version }}
       - ghcr.io/todd2982/watchtower:i386-latest
-    binaries:
+  -
+    ids:
       - watchtower
-  - 
-    use_buildx: true
     build_flag_templates: [ "--platform=linux/arm/v6" ]
     goos: linux
     goarch: arm
@@ -69,10 +72,9 @@ dockers:
       - todd2982/watchtower:armhf-latest
       - ghcr.io/todd2982/watchtower:armhf-{{ .Version }}
       - ghcr.io/todd2982/watchtower:armhf-latest
-    binaries:
+  -
+    ids:
       - watchtower
-  - 
-    use_buildx: true
     build_flag_templates: [ "--platform=linux/arm64/v8" ]
     goos: linux
     goarch: arm64
@@ -83,5 +85,3 @@ dockers:
       - todd2982/watchtower:arm64v8-latest
       - ghcr.io/todd2982/watchtower:arm64v8-{{ .Version }}
       - ghcr.io/todd2982/watchtower:arm64v8-latest
-    binaries:
-      - watchtower
