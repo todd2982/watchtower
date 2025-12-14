@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/cli v28.3.2+incompatible
+	github.com/docker/cli v29.1.3+incompatible
 	github.com/docker/docker v25.0.13+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/onsi/ginkgo v1.16.5
