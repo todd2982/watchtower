@@ -11,7 +11,7 @@ import (
 
 	"github.com/onsi/ginkgo"
 
-	t "github.com/containrrr/watchtower/pkg/types"
+	t "github.com/todd2982/watchtower/pkg/types"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
