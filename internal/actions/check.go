@@ -74,7 +74,10 @@ func cleanupExcessWatchtowers(containers []types.Container, client container.Cli
 
 		if cleanup {
 			if err := client.RemoveImageByID(c.ImageID()); err != nil {
-				log.WithError(err).Warning("Could not cleanup watchtower images, possibly because of other watchtowers instances in other scopes.")
+				log.WithError(err).Debug(
+					"Unable to remove old watchtower image - likely still in use by other watchtower " +
+						"instances running with different scopes/filters. This is normal when running " +
+						"multiple watchtower instances. The image will be cleaned up when all instances using it are stopped.")
 			}
 		}
 	}
