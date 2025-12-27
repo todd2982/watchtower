@@ -5,6 +5,9 @@ RUN apk add --no-cache \
     tzdata
 
 FROM scratch
+# Note: This label uses the original project namespace (com.centurylinklabs.watchtower)
+# for backward compatibility. Changing it would break existing user configurations
+# and scripts that rely on this label to identify watchtower containers.
 LABEL "com.centurylinklabs.watchtower"="true"
 
 COPY --from=alpine \
