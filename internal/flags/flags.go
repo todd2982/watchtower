@@ -168,7 +168,11 @@ func RegisterSystemFlags(rootCmd *cobra.Command) {
 		"http-api-token",
 		"",
 		envString("WATCHTOWER_HTTP_API_TOKEN"),
-		"Sets an authentication token to HTTP API requests.")
+		"Authentication token for HTTP API requests. "+
+			"SECURITY: Use a strong, randomly-generated token (e.g., 'openssl rand -hex 32'). "+
+			"This token grants full control over container updates. "+
+			"Protect it like a password and rotate regularly. "+
+			"WARNING: Tokens are transmitted over HTTP (unencrypted) unless using a reverse proxy with HTTPS.")
 
 	flags.BoolP(
 		"http-api-periodic-polls",
