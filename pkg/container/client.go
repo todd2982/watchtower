@@ -198,8 +198,10 @@ func (client dockerClient) StopContainer(c t.Container, timeout time.Duration) e
 		}
 	}
 
-	// TODO: This should probably be checked.
-	_ = client.waitForStopOrTimeout(c, timeout)
+	// Wait for container to stop gracefully, but continue with force removal if it doesn't
+	if err := client.waitForStopOrTimeout(c, timeout); err != nil {
+		log.Warnf("Failed to verify container %s (%s) stopped: %v. Proceeding with forced removal.", c.Name(), shortID, err)
+	}
 
 	if c.ContainerInfo().HostConfig.AutoRemove {
 		log.Debugf("AutoRemove container %s, skipping ContainerRemove call.", shortID)
