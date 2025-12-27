@@ -188,3 +188,12 @@ Releases are automated via **goreleaser** (`goreleaser.yml`):
 3. **Image Digests:** Updates are detected by comparing image digests, not tags
 4. **Time Zones:** Container timezone data is included in the `FROM scratch` final image
 5. **Health Checks:** The binary supports `--health-check` flag for container health probes
+6. **Label Namespace:** All watchtower labels use the `com.centurylinklabs.watchtower` namespace from the original project for backward compatibility. This is intentional and should NOT be changed, as it would break existing user configurations.
+
+## Fork Compatibility Notes
+
+This fork (todd2982/watchtower) maintains API compatibility with the original watchtower project:
+
+- **Docker Labels:** All configuration labels (`com.centurylinklabs.watchtower.*`) use the original namespace for backward compatibility
+- **Breaking Changes:** Changes that would break compatibility with existing user configurations should be avoided
+- **Documentation:** When adding features, maintain consistency with the original project's label conventions
