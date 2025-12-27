@@ -375,10 +375,21 @@ func runUpdatesWithNotifications(filter t.Filter) *metrics.Metric {
 	}
 	notifier.SendNotification(result)
 	metricResults := metrics.NewMetric(result)
-	notifications.LocalLog.WithFields(log.Fields{
+
+	// Log session completion with appropriate level and clear success/failure indication
+	fields := log.Fields{
 		"Scanned": metricResults.Scanned,
 		"Updated": metricResults.Updated,
 		"Failed":  metricResults.Failed,
-	}).Info("Session done")
+	}
+
+	if metricResults.Failed > 0 {
+		notifications.LocalLog.WithFields(fields).Warn("Session completed with failures")
+	} else if metricResults.Updated > 0 {
+		notifications.LocalLog.WithFields(fields).Info("Session completed successfully - containers updated")
+	} else {
+		notifications.LocalLog.WithFields(fields).Info("Session completed successfully - no updates needed")
+	}
+
 	return metricResults
 }
