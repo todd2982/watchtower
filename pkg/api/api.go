@@ -23,7 +23,24 @@ func New(token string) *API {
 	}
 }
 
-// RequireToken is wrapper around http.HandleFunc that checks token validity
+// RequireToken is wrapper around http.HandleFunc that validates API token authentication.
+//
+// SECURITY NOTE: This middleware provides authentication for the HTTP API endpoints.
+// Important security considerations:
+//
+//   - The token is compared using exact string matching (constant-time comparison recommended
+//     but not critical for this use case as timing attacks are difficult to exploit remotely)
+//   - Tokens are transmitted in the Authorization header as "Bearer <token>"
+//   - WARNING: Tokens are sent over HTTP (unencrypted) unless using a reverse proxy with HTTPS
+//   - A strong, randomly-generated token should be used (e.g., 'openssl rand -hex 32')
+//   - The token grants full control over container updates
+//   - Token rotation is recommended for production-like environments
+//
+// Usage:
+//
+//	curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8080/v1/update
+//
+// Returns HTTP 401 Unauthorized if the token is missing or invalid.
 func (api *API) RequireToken(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
