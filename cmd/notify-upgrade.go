@@ -41,7 +41,8 @@ func runNotifyUpgradeE(cmd *cobra.Command, _ []string) error {
 
 	logf("Found notification configurations for: %v", strings.Join(notifier.GetNames(), ", "))
 
-	outFile, err := os.CreateTemp("/", "watchtower-notif-urls-*")
+	// Use empty string to create temp file in system's default temp directory (cross-platform)
+	outFile, err := os.CreateTemp("", "watchtower-notif-urls-*")
 	if err != nil {
 		return fmt.Errorf("failed to create output file: %v", err)
 	}
