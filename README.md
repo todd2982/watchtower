@@ -6,8 +6,6 @@
   A process for automating Docker container base image updates.
   <br/><br/>
   
-  [![Circle CI](https://circleci.com/gh/todd2982/watchtower.svg?style=shield)](https://circleci.com/gh/todd2982/watchtower)
-  [![codecov](https://codecov.io/gh/todd2982/watchtower/branch/main/graph/badge.svg)](https://codecov.io/gh/todd2982/watchtower)
   [![GoDoc](https://godoc.org/github.com/todd2982/watchtower?status.svg)](https://godoc.org/github.com/todd2982/watchtower)
   [![Go Report Card](https://goreportcard.com/badge/github.com/todd2982/watchtower)](https://goreportcard.com/report/github.com/todd2982/watchtower)
   [![latest version](https://img.shields.io/github/tag/todd2982/watchtower.svg)](https://github.com/todd2982/watchtower/releases)
