@@ -441,6 +441,29 @@ func (client dockerClient) RemoveImageByID(id t.ImageID) error {
 	return err
 }
 
+// ExecuteCommand executes a command inside a container using 'sh -c'.
+//
+// SECURITY WARNING: This function is used for lifecycle hooks and executes arbitrary
+// shell commands inside containers. It presents command injection risks if not properly
+// used:
+//
+//   - Commands are executed with the permissions of the container's user
+//   - The command parameter is passed directly to 'sh -c', enabling shell interpretation
+//   - NEVER use user-supplied or untrusted input in the command parameter
+//   - Commands should be carefully audited and validated before execution
+//
+// The function will block until the command completes or the timeout is reached.
+// An exit code of 75 (EX_TEMPFAIL) signals that the update should be skipped for
+// this container.
+//
+// Parameters:
+//   - containerID: The container in which to execute the command
+//   - command: The shell command to execute (passed to 'sh -c')
+//   - timeout: Maximum execution time in minutes (0 = no timeout)
+//
+// Returns:
+//   - SkipUpdate: true if exit code is 75 (EX_TEMPFAIL), indicating update should be skipped
+//   - err: Any error that occurred during command execution
 func (client dockerClient) ExecuteCommand(containerID t.ContainerID, command string, timeout int) (SkipUpdate bool, err error) {
 	bg := context.Background()
 	clog := log.WithField("containerID", containerID)

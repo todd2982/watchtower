@@ -28,7 +28,34 @@ func New(updateFn func(images []string), updateLock chan bool) *Handler {
 	}
 }
 
-// Handler is an API handler used for triggering container update scans
+// Handler is an API handler used for triggering container update scans.
+//
+// The /v1/update endpoint accepts both GET and POST requests and supports
+// optional query parameters to target specific images.
+//
+// Usage Examples:
+//
+//	# Trigger update for all containers (non-blocking if update already running)
+//	GET  /v1/update
+//	POST /v1/update
+//
+//	# Trigger update for specific image(s) (blocking, waits for current update to finish)
+//	GET  /v1/update?image=nginx
+//	POST /v1/update?image=nginx
+//	GET  /v1/update?image=nginx&image=redis
+//	GET  /v1/update?image=nginx,redis
+//
+// Behavior:
+//   - Without image parameter: Non-blocking. Skips if another update is already running.
+//   - With image parameter(s): Blocking. Waits for any running update to complete, then
+//     updates only the specified image(s).
+//
+// The image parameter can be:
+//   - Single image: ?image=nginx
+//   - Multiple parameters: ?image=nginx&image=redis
+//   - Comma-separated: ?image=nginx,redis
+//
+// Note: HTTP method (GET vs POST) does not affect behavior. Both are handled identically.
 type Handler struct {
 	fn   func(images []string)
 	Path string

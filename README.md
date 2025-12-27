@@ -36,6 +36,41 @@ Watchtower is intended to be used in homelabs, media centers, local dev environm
 ## Documentation
 The full documentation is available at https://todd2982.dev/watchtower.
 
+## Security Considerations
+
+⚠️ **Watchtower is designed for homelabs and local development, not production environments.** Please review these security considerations before deploying:
+
+### Docker Socket Access
+
+Watchtower requires access to `/var/run/docker.sock`, which grants **full control over all containers** on the host. This is equivalent to root access. Only run watchtower in trusted environments.
+
+### HTTP API
+
+The HTTP API (`--http-api-update`) exposes container update controls:
+
+- **No TLS by default**: API requests are sent over unencrypted HTTP
+- **Token authentication**: Use a strong token (see `--http-api-token` flag help)
+- **Network exposure**: Bind to localhost only in untrusted networks using Docker port mapping: `-p 127.0.0.1:8080:8080`
+- **Recommendation**: Use a reverse proxy with HTTPS for any non-local access
+
+### Lifecycle Hooks
+
+Lifecycle hooks (`--enable-lifecycle-hooks`) execute arbitrary commands inside containers:
+
+- **Command injection risk**: Hooks run with container permissions
+- **User-supplied commands**: Never use untrusted input in hook commands
+- **Recommendation**: Carefully audit all lifecycle hook configurations
+
+### Registry Credentials
+
+- Watchtower may handle registry credentials for pulling images
+- Credentials are passed to the Docker daemon and may appear in logs at TRACE level
+- Store credentials securely and use registry access tokens when possible
+
+### Reporting Security Issues
+
+To report security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

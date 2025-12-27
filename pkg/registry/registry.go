@@ -10,7 +10,25 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// GetPullOptions creates a struct with all options needed for pulling images from a registry
+// GetPullOptions creates a struct with all options needed for pulling images from a registry.
+//
+// SECURITY NOTE: This function handles registry authentication credentials.
+// Important security considerations:
+//
+//   - Credentials are read from Docker config files (~/.docker/config.json or system config)
+//   - Authentication data is base64-encoded and passed to the Docker daemon
+//   - WARNING: Credentials can appear in logs if TRACE level logging is enabled
+//     (see commented line 44 - kept commented for security)
+//   - Credentials are only used for image pulls and are not stored by watchtower
+//   - The Docker daemon handles credential storage and retrieval
+//
+// Best practices:
+//   - Use registry access tokens instead of passwords when possible
+//   - Avoid TRACE level logging in production to prevent credential leakage
+//   - Ensure Docker config files have appropriate file permissions (0600)
+//   - Consider using credential helpers for enhanced security
+//
+// The function returns empty PullOptions if no authentication is required or configured.
 func GetPullOptions(imageName string) (image.PullOptions, error) {
 	auth, err := EncodedAuth(imageName)
 	log.Debugf("Got image name: %s", imageName)
