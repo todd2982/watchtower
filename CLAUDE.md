@@ -138,7 +138,7 @@ All CLI flags have corresponding environment variables. See `internal/flags/` fo
 
 The version string is injected at build time via ldflags:
 ```bash
--ldflags "-X github.com/containrrr/watchtower/internal/meta.Version=$VERSION"
+-ldflags "-X github.com/todd2982/watchtower/internal/meta.Version=$VERSION"
 ```
 
 Access the version using `internal/meta.Version` - do not hardcode version strings elsewhere.
