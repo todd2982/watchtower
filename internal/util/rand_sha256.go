@@ -22,6 +22,7 @@ func GenerateRandomPrefixedSHA256() string {
 	sb := bytes.NewBufferString("sha256:")
 	sb.Grow(64)
 	for _, h := range hash {
+		// fmt.Fprintf to bytes.Buffer never fails (bytes.Buffer.Write never returns an error)
 		_, _ = fmt.Fprintf(sb, "%02x", h)
 	}
 	return sb.String()
