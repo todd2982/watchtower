@@ -50,7 +50,7 @@ The HTTP API (`--http-api-update`) exposes container update controls:
 
 - **No TLS by default**: API requests are sent over unencrypted HTTP
 - **Token authentication**: Use a strong token (see `--http-api-token` flag help)
-- **Network exposure**: Bind to localhost only in untrusted networks
+- **Network exposure**: Bind to localhost only in untrusted networks using Docker port mapping: `-p 127.0.0.1:8080:8080`
 - **Recommendation**: Use a reverse proxy with HTTPS for any non-local access
 
 ### Lifecycle Hooks

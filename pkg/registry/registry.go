@@ -18,7 +18,7 @@ import (
 //   - Credentials are read from Docker config files (~/.docker/config.json or system config)
 //   - Authentication data is base64-encoded and passed to the Docker daemon
 //   - WARNING: Credentials can appear in logs if TRACE level logging is enabled
-//     (see commented line 26 - kept commented for security)
+//     (see commented line 44 - kept commented for security)
 //   - Credentials are only used for image pulls and are not stored by watchtower
 //   - The Docker daemon handles credential storage and retrieval
 //
