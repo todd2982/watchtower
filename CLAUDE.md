@@ -138,7 +138,7 @@ All CLI flags have corresponding environment variables. See `internal/flags/` fo
 
 The version string is injected at build time via ldflags:
 ```bash
--ldflags "-X github.com/containrrr/watchtower/internal/meta.Version=$VERSION"
+-ldflags "-X github.com/todd2982/watchtower/internal/meta.Version=$VERSION"
 ```
 
 Access the version using `internal/meta.Version` - do not hardcode version strings elsewhere.
@@ -155,18 +155,24 @@ Access the version using `internal/meta.Version` - do not hardcode version strin
 
 - **`.github/workflows/release.yml`** - Production releases on `v*.*.*` tags
   - Multi-platform builds (Linux, Windows: amd64, 386, arm, arm64)
-  - Docker images published to Docker Hub and GHCR
-  - Uses goreleaser for build orchestration
-- **`.github/workflows/release-dev.yaml`** - Development releases
+  - Docker images published to Docker Hub only
+  - Uses goreleaser for build orchestration and automatic manifest creation
+- **`.github/workflows/release-dev.yaml`** - Development releases on every push to main
+  - Publishes single-arch `latest-dev` tag to Docker Hub
+  - Fast builds for rapid iteration
 - **`.github/workflows/pull-request.yml`** - PR validation and testing
+  - Runs tests on all platforms (Linux, macOS, Windows)
+  - Builds binaries and Docker images locally (without publishing)
 
 ### Release Process
 
 Releases are automated via **goreleaser** (`goreleaser.yml`):
 - Triggered by pushing version tags: `git tag v1.2.3 && git push --tags`
-- Builds binaries for multiple platforms
-- Creates Docker images with multi-arch manifests
-- Publishes to GitHub releases, Docker Hub (`todd2982/watchtower`), and GHCR
+- Builds binaries for multiple platforms (Linux, Windows: amd64, 386, arm, arm64)
+- Creates 4 architecture-specific Docker images (amd64, i386, armhf, arm64v8)
+- Automatically creates multi-arch manifests via `docker_manifests` section
+- Publishes to GitHub releases and Docker Hub (`todd2982/watchtower`)
+- Tags created: `{version}`, `latest`, `{arch}-{version}`, `{arch}-latest`
 
 ## Testing Considerations
 
