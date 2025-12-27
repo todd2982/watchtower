@@ -44,8 +44,6 @@ dockers:
     image_templates:
       - todd2982/watchtower:amd64-{{ .Version }}
       - todd2982/watchtower:amd64-latest
-      - ghcr.io/todd2982/watchtower:amd64-{{ .Version }}
-      - ghcr.io/todd2982/watchtower:amd64-latest
   -
     ids:
       - watchtower
@@ -57,8 +55,6 @@ dockers:
     image_templates:
       - todd2982/watchtower:i386-{{ .Version }}
       - todd2982/watchtower:i386-latest
-      - ghcr.io/todd2982/watchtower:i386-{{ .Version }}
-      - ghcr.io/todd2982/watchtower:i386-latest
   -
     ids:
       - watchtower
@@ -70,8 +66,6 @@ dockers:
     image_templates:
       - todd2982/watchtower:armhf-{{ .Version }}
       - todd2982/watchtower:armhf-latest
-      - ghcr.io/todd2982/watchtower:armhf-{{ .Version }}
-      - ghcr.io/todd2982/watchtower:armhf-latest
   -
     ids:
       - watchtower
@@ -83,5 +77,16 @@ dockers:
     image_templates:
       - todd2982/watchtower:arm64v8-{{ .Version }}
       - todd2982/watchtower:arm64v8-latest
-      - ghcr.io/todd2982/watchtower:arm64v8-{{ .Version }}
-      - ghcr.io/todd2982/watchtower:arm64v8-latest
+docker_manifests:
+  - name_template: todd2982/watchtower:{{ .Version }}
+    image_templates:
+      - todd2982/watchtower:amd64-{{ .Version }}
+      - todd2982/watchtower:i386-{{ .Version }}
+      - todd2982/watchtower:armhf-{{ .Version }}
+      - todd2982/watchtower:arm64v8-{{ .Version }}
+  - name_template: todd2982/watchtower:latest
+    image_templates:
+      - todd2982/watchtower:amd64-latest
+      - todd2982/watchtower:i386-latest
+      - todd2982/watchtower:armhf-latest
+      - todd2982/watchtower:arm64v8-latest
