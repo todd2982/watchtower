@@ -145,7 +145,7 @@ func RegisterSystemFlags(rootCmd *cobra.Command) {
 		"enable-lifecycle-hooks",
 		"",
 		envBool("WATCHTOWER_LIFECYCLE_HOOKS"),
-		"Enable the execution of commands triggered by pre- and post-update lifecycle hooks")
+		"Enable the execution of commands triggered by pre- and post-update lifecycle hooks. WARNING: Commands from container labels are executed without sanitization. Only enable if you trust all container label sources")
 
 	flags.BoolP(
 		"rolling-restart",
