@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -156,9 +157,8 @@ var _ = Describe("API", func() {
 
 				handlerFunc(rec, req)
 
-				// Depending on implementation, this may pass or fail
-				// The test documents the behavior
-				_ = rec.Code
+				// Should fail because "Bearer    token" doesn't match "Bearer token"
+				Expect(rec.Code).To(Equal(http.StatusUnauthorized))
 			})
 		})
 
@@ -169,10 +169,7 @@ var _ = Describe("API", func() {
 				rec := httptest.NewRecorder()
 				req := httptest.NewRequest("GET", "/hello", nil)
 				// Create a very long token (100KB)
-				longToken := string(make([]byte, 100000))
-				for i := range longToken {
-					longToken = longToken[:i] + "a" + longToken[i+1:]
-				}
+				longToken := strings.Repeat("a", 100000)
 				req.Header.Set("Authorization", "Bearer " + longToken)
 
 				handlerFunc(rec, req)
@@ -233,8 +230,8 @@ var _ = Describe("API", func() {
 
 				handlerFunc(rec, req)
 
-				// Depending on implementation, may accept or reject
-				_ = rec.Code
+				// Should reject because "bearer" (lowercase) doesn't match "Bearer"
+				Expect(rec.Code).To(Equal(http.StatusUnauthorized))
 			})
 
 			It("should reject different auth schemes", func() {
@@ -259,8 +256,8 @@ var _ = Describe("API", func() {
 
 				handlerFunc(rec, req)
 
-				// Should handle multiple headers (behavior depends on implementation)
-				_ = rec.Code
+				// Should reject - Header.Get() returns first value which is invalid
+				Expect(rec.Code).To(Equal(http.StatusUnauthorized))
 			})
 
 			It("should reject partial token matches", func() {

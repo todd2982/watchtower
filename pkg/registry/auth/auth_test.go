@@ -155,10 +155,9 @@ var _ = Describe("the auth module", func() {
 				challenge := `bearer realm=https://ghcr.io/token,service=ghcr.io`
 				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
 				Expect(err).NotTo(HaveOccurred())
-				URL, err := auth.GetAuthURL(challenge, imageRef)
-				// Should either parse successfully or return error, but not panic
-				_ = URL
-				_ = err
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				// Malformed challenge without quotes should return an error
+				Expect(err).To(HaveOccurred())
 			})
 
 			It("should handle missing realm", func() {
@@ -185,14 +184,13 @@ var _ = Describe("the auth module", func() {
 				Expect(err).To(HaveOccurred())
 			})
 
-			It("should handle missing service parameter", func() {
+			It("should reject missing service parameter", func() {
 				challenge := `bearer realm="https://ghcr.io/token",scope="repository:user/image:pull"`
 				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
 				Expect(err).NotTo(HaveOccurred())
-				URL, err := auth.GetAuthURL(challenge, imageRef)
-				// Should still succeed, service is optional in some cases
-				_ = URL
-				_ = err
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				// Production code requires service parameter (auth.go:132)
+				Expect(err).To(HaveOccurred())
 			})
 
 			It("should handle challenge with special characters", func() {
@@ -200,9 +198,9 @@ var _ = Describe("the auth module", func() {
 				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
 				Expect(err).NotTo(HaveOccurred())
 				URL, err := auth.GetAuthURL(challenge, imageRef)
-				// Should handle URL with query parameters
-				_ = URL
-				_ = err
+				// Should successfully handle URL with query parameters
+				Expect(err).NotTo(HaveOccurred())
+				Expect(URL).NotTo(BeNil())
 			})
 
 			It("should handle very long challenge headers", func() {
@@ -210,18 +208,19 @@ var _ = Describe("the auth module", func() {
 				challenge := fmt.Sprintf(`bearer realm="https://ghcr.io/token",service="ghcr.io",scope="%s"`, longScope)
 				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
 				Expect(err).NotTo(HaveOccurred())
-				_, err = auth.GetAuthURL(challenge, imageRef)
-				// Should not panic with very long inputs
-				_ = err
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				// Should handle very long inputs without panicking
+				Expect(err).NotTo(HaveOccurred())
+				Expect(URL).NotTo(BeNil())
 			})
 
-			It("should handle challenge with extra whitespace", func() {
+			It("should reject challenge with extra whitespace around equals", func() {
 				challenge := `bearer   realm = "https://ghcr.io/token" , service = "ghcr.io" , scope = "repository:user/image:pull" `
 				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
 				Expect(err).NotTo(HaveOccurred())
 				_, err = auth.GetAuthURL(challenge, imageRef)
-				// May or may not succeed depending on implementation, but should not panic
-				_ = err
+				// Parser expects "key=value" format without spaces around =
+				Expect(err).To(HaveOccurred())
 			})
 		})
 
@@ -239,14 +238,12 @@ var _ = Describe("the auth module", func() {
 				Expect(scope).To(ContainSubstring(":pull"))
 			})
 
-			It("should handle image names with uppercase letters", func() {
-				challenge := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull"`
-				// Note: Docker registry names are normalized to lowercase
-				imageRef, err := ref.ParseNormalizedNamed("MyRegistry.com/MyOrg/MyImage")
-				Expect(err).NotTo(HaveOccurred())
-				URL, err := auth.GetAuthURL(challenge, imageRef)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(URL).NotTo(BeNil())
+			It("should reject image names with uppercase letters in repository path", func() {
+				// Docker registry reference library enforces lowercase repository names
+				_, err := ref.ParseNormalizedNamed("MyRegistry.com/MyOrg/MyImage")
+				// Repository names must be lowercase - the library should reject this
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("must be lowercase"))
 			})
 
 			It("should handle image names with ports", func() {

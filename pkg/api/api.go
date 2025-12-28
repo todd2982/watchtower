@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/subtle"
 	"fmt"
 	"net/http"
 
@@ -45,7 +46,8 @@ func (api *API) RequireToken(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		want := fmt.Sprintf("Bearer %s", api.Token)
-		if auth != want {
+		// Use constant-time comparison to prevent timing attacks
+		if subtle.ConstantTimeCompare([]byte(auth), []byte(want)) != 1 {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
