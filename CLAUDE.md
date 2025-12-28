@@ -7,7 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Watchtower is an automated Docker container base image update tool written in Go. It monitors running Docker containers and automatically updates them when their base images change in the registry. The tool is designed for homelabs, media centers, and local dev environments - NOT for production/commercial use (Kubernetes is recommended for that).
 
 **Repository:** github.com/todd2982/watchtower
-**Documentation:** https://todd2982.dev/watchtower
 
 ## Development Commands
 
@@ -105,6 +104,7 @@ docker run --rm \
 ### Configuration
 
 Configuration is loaded via **Viper** with the following precedence (highest to lowest):
+
 1. Command-line flags
 2. Environment variables (prefixed with `WATCHTOWER_`)
 3. Config files (if specified)
@@ -137,6 +137,7 @@ All CLI flags have corresponding environment variables. See `internal/flags/` fo
 ### Version Injection
 
 The version string is injected at build time via ldflags:
+
 ```bash
 -ldflags "-X github.com/todd2982/watchtower/internal/meta.Version=$VERSION"
 ```
@@ -169,6 +170,7 @@ Access the version using `internal/meta.Version` - do not hardcode version strin
 ### Release Process
 
 Releases are automated via **goreleaser** (`goreleaser.yml`):
+
 - Triggered by pushing version tags: `git tag v1.2.3 && git push --tags`
 - Builds binaries for multiple platforms (Linux, Windows: amd64, 386, arm, arm64)
 - Creates 4 architecture-specific Docker images (amd64, i386, armhf, arm64v8)
