@@ -10,33 +10,114 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "github-actions"
 
   - package-ecosystem: "gomod" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group all Go module updates together to reduce PR noise
+    groups:
+      go-modules:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "go"
 
   - package-ecosystem: "docker" # See documentation for possible values
     directory: "/dockerfiles" # Location of package manifests
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group Docker updates together
+    groups:
+      docker:
+        patterns:
+          - "*"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "docker"
 
   - package-ecosystem: "docker-compose" # docker-compose.yml at root
     directory: "/" # Location of docker-compose.yml
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group Docker Compose updates together
+    groups:
+      docker-compose:
+        patterns:
+          - "*"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "docker-compose"
 
   - package-ecosystem: "docker-compose" # docker-compose.yml in container-networking
     directory: "/dockerfiles/container-networking" # Location of docker-compose.yml
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group Docker Compose updates together
+    groups:
+      docker-compose:
+        patterns:
+          - "*"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "docker-compose"
 
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 50
+    # Group pip updates together
+    groups:
+      pip:
+        patterns:
+          - "*"
+    # Customize commit messages to follow conventional commits
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Add labels for better organization
+    labels:
+      - "dependencies"
+      - "python"
