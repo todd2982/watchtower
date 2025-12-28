@@ -11,7 +11,6 @@ FROM scratch
 LABEL "com.centurylinklabs.watchtower"="true"
 LABEL org.opencontainers.image.source="https://github.com/todd2982/watchtower"
 LABEL org.opencontainers.image.documentation="https://todd2982.dev/watchtower"
-LABEL org.opencontainers.image.vendor="T.R. Stark LLC"
 
 COPY --from=alpine \
     /etc/ssl/certs/ca-certificates.crt \
