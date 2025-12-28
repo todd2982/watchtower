@@ -44,6 +44,14 @@ rules:
   body-leading-blank:
     - 2
     - always
+  body-max-line-length:
+    - 1
+    - always
+    - 100
+  body-max-length:
+    - 1
+    - always
+    - 1000
 
   # Footer should have a blank line before it
   footer-leading-blank:
