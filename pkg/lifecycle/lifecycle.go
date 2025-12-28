@@ -37,6 +37,7 @@ func ExecutePreCheckCommand(client container.Client, container types.Container) 
 		return
 	}
 
+	clog.Warn("SECURITY: Executing pre-check lifecycle hook command from container labels")
 	clog.Debug("Executing pre-check command.")
 	_, err := client.ExecuteCommand(container.ID(), command, 1)
 	if err != nil {
@@ -53,6 +54,7 @@ func ExecutePostCheckCommand(client container.Client, container types.Container)
 		return
 	}
 
+	clog.Warn("SECURITY: Executing post-check lifecycle hook command from container labels")
 	clog.Debug("Executing post-check command.")
 	_, err := client.ExecuteCommand(container.ID(), command, 1)
 	if err != nil {
@@ -76,6 +78,7 @@ func ExecutePreUpdateCommand(client container.Client, container types.Container)
 		return false, nil
 	}
 
+	clog.Warn("SECURITY: Executing pre-update lifecycle hook command from container labels")
 	clog.Debug("Executing pre-update command.")
 	return client.ExecuteCommand(container.ID(), command, timeout)
 }
@@ -97,6 +100,7 @@ func ExecutePostUpdateCommand(client container.Client, newContainerID types.Cont
 		return
 	}
 
+	clog.Warn("SECURITY: Executing post-update lifecycle hook command from container labels")
 	clog.Debug("Executing post-update command.")
 	_, err = client.ExecuteCommand(newContainerID, command, timeout)
 

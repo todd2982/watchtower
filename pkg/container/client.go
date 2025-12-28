@@ -443,14 +443,25 @@ func (client dockerClient) RemoveImageByID(id t.ImageID) error {
 
 // ExecuteCommand executes a command inside a container using 'sh -c'.
 //
-// SECURITY WARNING: This function is used for lifecycle hooks and executes arbitrary
-// shell commands inside containers. It presents command injection risks if not properly
-// used:
+// ⚠️  SECURITY WARNING: COMMAND INJECTION VULNERABILITY ⚠️
 //
+// This function is used for lifecycle hooks and executes arbitrary shell commands
+// inside containers WITHOUT any sanitization or validation. Commands are sourced
+// from container labels which may be controlled by untrusted parties in multi-tenant
+// or shared environments.
+//
+// Security implications:
 //   - Commands are executed with the permissions of the container's user
-//   - The command parameter is passed directly to 'sh -c', enabling shell interpretation
-//   - NEVER use user-supplied or untrusted input in the command parameter
-//   - Commands should be carefully audited and validated before execution
+//   - The command parameter is passed directly to 'sh -c', enabling full shell interpretation
+//   - NO input validation or sanitization is performed
+//   - An attacker who can set container labels can execute arbitrary commands
+//   - In Docker-in-Docker scenarios, this could potentially escape to the host
+//
+// Mitigation:
+//   - Lifecycle hooks are DISABLED by default
+//   - Only enable via --enable-lifecycle-hooks flag if you trust ALL container label sources
+//   - Carefully audit all containers with lifecycle hook labels before enabling
+//   - Consider using a separate Docker socket or namespace for untrusted containers
 //
 // The function will block until the command completes or the timeout is reached.
 // An exit code of 75 (EX_TEMPFAIL) signals that the update should be skipped for
