@@ -22,9 +22,9 @@ func (c ByCreated) Less(i, j int) bool {
 		t1 = time.Now()
 	}
 
-	t2, _ := time.Parse(time.RFC3339Nano, c[j].ContainerInfo().Created)
-	if err != nil {
-		t1 = time.Now()
+	t2, err2 := time.Parse(time.RFC3339Nano, c[j].ContainerInfo().Created)
+	if err2 != nil {
+		t2 = time.Now()
 	}
 
 	return t1.Before(t2)
