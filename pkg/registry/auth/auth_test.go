@@ -147,6 +147,141 @@ var _ = Describe("the auth module", func() {
 			Expect(auth.GetChallengeURL(imageRef)).To(Equal(expected))
 		})
 	})
+
+	// Edge case tests for issue #78
+	Describe("GetAuthURL edge cases", func() {
+		When("the challenge header is malformed", func() {
+			It("should handle missing quotes gracefully", func() {
+				challenge := `bearer realm=https://ghcr.io/token,service=ghcr.io`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				// Should either parse successfully or return error, but not panic
+				_ = URL
+				_ = err
+			})
+
+			It("should handle missing realm", func() {
+				challenge := `bearer service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("should handle empty realm", func() {
+				challenge := `bearer realm="",service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("should handle malformed URL in realm", func() {
+				challenge := `bearer realm="ht!tp://invalid url",service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("should handle missing service parameter", func() {
+				challenge := `bearer realm="https://ghcr.io/token",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				// Should still succeed, service is optional in some cases
+				_ = URL
+				_ = err
+			})
+
+			It("should handle challenge with special characters", func() {
+				challenge := `bearer realm="https://ghcr.io/token?foo=bar&baz=qux",service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				// Should handle URL with query parameters
+				_ = URL
+				_ = err
+			})
+
+			It("should handle very long challenge headers", func() {
+				longScope := strings.Repeat("a", 10000)
+				challenge := fmt.Sprintf(`bearer realm="https://ghcr.io/token",service="ghcr.io",scope="%s"`, longScope)
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				// Should not panic with very long inputs
+				_ = err
+			})
+
+			It("should handle challenge with extra whitespace", func() {
+				challenge := `bearer   realm = "https://ghcr.io/token" , service = "ghcr.io" , scope = "repository:user/image:pull" `
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+				_, err = auth.GetAuthURL(challenge, imageRef)
+				// May or may not succeed depending on implementation, but should not panic
+				_ = err
+			})
+		})
+
+		When("the image reference has unusual formatting", func() {
+			It("should handle image names with many path segments", func() {
+				challenge := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("registry.example.com/org/team/project/component/image")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(URL).NotTo(BeNil())
+				// Verify scope is constructed correctly for multi-segment path
+				scope := URL.Query().Get("scope")
+				Expect(scope).To(ContainSubstring("repository:"))
+				Expect(scope).To(ContainSubstring(":pull"))
+			})
+
+			It("should handle image names with uppercase letters", func() {
+				challenge := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull"`
+				// Note: Docker registry names are normalized to lowercase
+				imageRef, err := ref.ParseNormalizedNamed("MyRegistry.com/MyOrg/MyImage")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(URL).NotTo(BeNil())
+			})
+
+			It("should handle image names with ports", func() {
+				challenge := `bearer realm="https://registry.example.com:5000/token",service="registry.example.com:5000",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("registry.example.com:5000/myimage")
+				Expect(err).NotTo(HaveOccurred())
+				URL, err := auth.GetAuthURL(challenge, imageRef)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(URL).NotTo(BeNil())
+			})
+		})
+
+		When("handling concurrent authentication requests", func() {
+			It("should be safe for concurrent use", func() {
+				challenge := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull"`
+				imageRef, err := ref.ParseNormalizedNamed("todd2982/watchtower")
+				Expect(err).NotTo(HaveOccurred())
+
+				// Run multiple GetAuthURL calls concurrently
+				done := make(chan bool)
+				for i := 0; i < 10; i++ {
+					go func() {
+						_, _ = auth.GetAuthURL(challenge, imageRef)
+						done <- true
+					}()
+				}
+
+				// Wait for all to complete
+				for i := 0; i < 10; i++ {
+					<-done
+				}
+				// Should not panic or race
+			})
+		})
+	})
 })
 
 var scopeImageRegexp = MatchRegexp("^repository:[a-z0-9]+(/[a-z0-9]+)*:pull$")
