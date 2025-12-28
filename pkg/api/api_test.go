@@ -21,7 +21,7 @@ func TestAPI(t *testing.T) {
 }
 
 var _ = Describe("API", func() {
-	api := New(token)
+	api := New(token, 8080)
 
 	Describe("RequireToken middleware", func() {
 		It("should return 401 Unauthorized when token is not provided", func() {
@@ -179,7 +179,7 @@ var _ = Describe("API", func() {
 			})
 
 			It("should handle tokens with special characters", func() {
-				specialTokenAPI := New("token-with-special_chars.123!@#")
+				specialTokenAPI := New("token-with-special_chars.123!@#", 8080)
 				handlerFunc := specialTokenAPI.RequireToken(testHandler)
 
 				rec := httptest.NewRecorder()
@@ -193,7 +193,7 @@ var _ = Describe("API", func() {
 			})
 
 			It("should handle tokens with unicode characters", func() {
-				unicodeTokenAPI := New("token-with-üñíçødé-™")
+				unicodeTokenAPI := New("token-with-üñíçødé-™", 8080)
 				handlerFunc := unicodeTokenAPI.RequireToken(testHandler)
 
 				rec := httptest.NewRecorder()

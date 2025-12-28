@@ -345,6 +345,18 @@ Environment Variable: WATCHTOWER_HTTP_API_TOKEN
              Default: -
 ```
 
+## HTTP API Port
+
+Sets the port for the HTTP API server to listen on.
+Allows running multiple watchtower instances with HTTP API on the same host.
+
+```text
+            Argument: --http-api-port
+Environment Variable: WATCHTOWER_HTTP_API_PORT
+                Type: Integer
+             Default: 8080
+```
+
 ## HTTP API periodic polls
 Keep running periodic updates if the HTTP API mode is enabled, otherwise the HTTP API would prevent periodic polls.  
 
