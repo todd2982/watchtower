@@ -90,3 +90,28 @@ docker_manifests:
       - todd2982/watchtower:i386-latest
       - todd2982/watchtower:armhf-latest
       - todd2982/watchtower:arm64v8-latest
+changelog:
+  use: git
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^feat(\(.+\))?!?:'
+      order: 0
+    - title: Bug Fixes
+      regexp: '^fix(\(.+\))?!?:'
+      order: 1
+    - title: Security Updates
+      regexp: '^security(\(.+\))?!?:'
+      order: 2
+    - title: Documentation
+      regexp: '^docs(\(.+\))?!?:'
+      order: 3
+    - title: Other Changes
+      regexp: '.*'
+      order: 999
+  filters:
+    exclude:
+      - '^Merge pull request'
+      - '^Merge branch'
+      - '^chore\(deps\):'
+      - '^test:'

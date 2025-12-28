@@ -36,3 +36,36 @@ e.g.:
 ```bash
 sudo docker build . -f dockerfiles/Dockerfile.dev-self-contained -t todd2982/watchtower # to build an image from local files
 ```
+
+## Commit Messages
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/) for automated changelog generation. Using semantic commit messages helps create clear, user-friendly changelogs that are automatically published to GitHub Releases.
+
+**Commit Message Format:**
+
+```text
+<type>: <description>
+
+[optional body]
+```
+
+**Common Types:**
+
+- `feat:` - New features (e.g., `feat: add support for custom registry certificates`)
+- `fix:` - Bug fixes (e.g., `fix: resolve race condition in container restart logic`)
+- `docs:` - Documentation changes (e.g., `docs: clarify --cleanup flag behavior`)
+- `refactor:` - Code refactoring (e.g., `refactor: simplify container sorting logic`)
+- `test:` - Test additions or changes (e.g., `test: add coverage for notification handlers`)
+- `chore:` - Maintenance tasks (e.g., `chore: update dependencies`)
+- `security:` - Security updates (e.g., `security: update Alpine base image to patch CVE-2024-XXXX`)
+
+**Examples:**
+
+```bash
+feat: add support for webhook notifications
+fix: prevent duplicate container updates
+docs: add troubleshooting section to README
+security: upgrade Go dependencies to address vulnerabilities
+```
+
+Good commit messages help generate clear changelogs that explain what changed and why, making it easier for users to understand each release.

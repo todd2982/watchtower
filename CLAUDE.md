@@ -174,6 +174,40 @@ Releases are automated via **goreleaser** (`goreleaser.yml`):
 - Publishes to GitHub releases and Docker Hub (`todd2982/watchtower`)
 - Tags created: `{version}`, `latest`, `{arch}-{version}`, `{arch}-latest`
 
+### Changelog Generation
+
+Changelogs are automatically generated from semantic commit messages and published to GitHub Releases:
+
+**Semantic Commit Prefixes:**
+
+- `feat:` - New features (→ "Features" section)
+- `fix:` - Bug fixes (→ "Bug Fixes" section)
+- `security:` - Security updates (→ "Security Updates" section)
+- `docs:` - Documentation (→ "Documentation" section)
+- `chore(deps):` - Dependency updates (excluded from changelog)
+- `test:` - Test changes (excluded from changelog)
+
+**Automated Release Flow:**
+
+When a version tag is pushed, goreleaser automatically:
+
+1. Collects commits since the last tag
+2. Groups commits by semantic type
+3. Generates formatted changelog
+4. Publishes changelog to GitHub Releases
+5. Dependabot discovers changelog via `org.opencontainers.image.source` Docker label
+
+**Example commit messages:**
+
+```bash
+feat: add support for custom registry certificates
+fix: resolve race condition in container restart logic
+security: update Alpine base image to patch CVE-2024-XXXX
+docs: clarify --cleanup flag behavior in README
+```
+
+Good commit messages help generate clear, user-friendly changelogs.
+
 ## Testing Considerations
 
 - **BDD Style:** Tests use Ginkgo's `Describe`/`Context`/`It` structure
