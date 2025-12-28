@@ -208,6 +208,7 @@ feat: add support for custom registry certificates
 fix: resolve race condition in container restart logic
 security: update Alpine base image to patch CVE-2024-XXXX
 docs: clarify --cleanup flag behavior in README
+test: add security tests for execute command function
 ```
 
 Good commit messages help generate clear, user-friendly changelogs.
@@ -218,13 +219,19 @@ The project uses **commitlint** to enforce conventional commit message format:
 
 **Configuration:** `.commitlintrc.yml`
 
-**Validation:**
+**Validation Rules:**
 
 - Automated validation runs on all pull requests via GitHub Actions
 - Checks commit messages follow conventional commits specification
-- Ensures proper type prefixes (feat, fix, docs, etc.)
+- Ensures proper type prefixes (feat, fix, docs, security, test, etc.)
 - Validates header length (max 100 characters)
-- Requires proper formatting (lowercase, blank lines)
+- **IMPORTANT: Subject line must be lowercase/sentence-case** - capitalize only the first word after the type prefix
+  - ✅ Correct: `test: add security tests for execute command function`
+  - ❌ Wrong: `test: add security tests for ExecuteCommand function` (capitalized function name fails validation)
+  - ✅ Correct: `fix: resolve issue in docker client`
+  - ❌ Wrong: `fix: resolve issue in Docker Client` (capitalized words fail validation)
+- Body paragraphs can use normal capitalization and proper nouns
+- **IMPORTANT: Footer must have a leading blank line** - add a blank line before footers like Co-Authored-By or Generated with tags
 
 **Local validation (optional):**
 
