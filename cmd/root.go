@@ -315,7 +315,7 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 		lock <- true
 	}
 
-	scheduler := cron.New()
+	scheduler := cron.New(cron.WithSeconds())
 	_, err := scheduler.AddFunc(
 		scheduleSpec,
 		func() {
