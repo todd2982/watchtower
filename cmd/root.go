@@ -142,6 +142,7 @@ func Run(c *cobra.Command, names []string) {
 	enableMetricsAPI, _ := c.PersistentFlags().GetBool("http-api-metrics")
 	unblockHTTPAPI, _ := c.PersistentFlags().GetBool("http-api-periodic-polls")
 	apiToken, _ := c.PersistentFlags().GetString("http-api-token")
+	apiPort, _ := c.PersistentFlags().GetInt("http-api-port")
 	healthCheck, _ := c.PersistentFlags().GetBool("health-check")
 
 	if healthCheck {
@@ -179,7 +180,7 @@ func Run(c *cobra.Command, names []string) {
 	updateLock := make(chan bool, 1)
 	updateLock <- true
 
-	httpAPI := api.New(apiToken)
+	httpAPI := api.New(apiToken, apiPort)
 
 	if enableUpdateAPI {
 		updateHandler := update.New(func(images []string) {
@@ -263,6 +264,7 @@ func formatDuration(d time.Duration) string {
 func writeStartupMessage(c *cobra.Command, sched time.Time, filtering string) {
 	noStartupMessage, _ := c.PersistentFlags().GetBool("no-startup-message")
 	enableUpdateAPI, _ := c.PersistentFlags().GetBool("http-api-update")
+	apiPort, _ := c.PersistentFlags().GetInt("http-api-port")
 
 	var startupLog *log.Entry
 	if noStartupMessage {
@@ -295,8 +297,7 @@ func writeStartupMessage(c *cobra.Command, sched time.Time, filtering string) {
 	}
 
 	if enableUpdateAPI {
-		// TODO: make listen port configurable
-		startupLog.Info("The HTTP API is enabled at :8080.")
+		startupLog.Info("The HTTP API is enabled at :" + strconv.Itoa(apiPort) + ".")
 	}
 
 	if !noStartupMessage {
