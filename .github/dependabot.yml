@@ -23,6 +23,18 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 50
 
+  - package-ecosystem: "docker" # docker-compose.yml at root
+    directory: "/" # Location of docker-compose.yml
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 50
+
+  - package-ecosystem: "docker" # docker-compose.yml in container-networking
+    directory: "/dockerfiles/container-networking" # Location of docker-compose.yml
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 50
+
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
