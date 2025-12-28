@@ -22,7 +22,7 @@ import (
 	"github.com/todd2982/watchtower/pkg/metrics"
 	"github.com/todd2982/watchtower/pkg/notifications"
 	t "github.com/todd2982/watchtower/pkg/types"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -315,8 +315,8 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 		lock <- true
 	}
 
-	scheduler := cron.New()
-	err := scheduler.AddFunc(
+	scheduler := cron.New(cron.WithSeconds())
+	_, err := scheduler.AddFunc(
 		scheduleSpec,
 		func() {
 			select {
