@@ -47,5 +47,5 @@ rules:
 
   # Footer should have a blank line before it
   footer-leading-blank:
-    - 2
+    - 1
     - always
