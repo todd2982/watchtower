@@ -1,0 +1,51 @@
+# Commitlint configuration for conventional commits
+# See: https://commitlint.js.org/
+
+extends:
+  - '@commitlint/config-conventional'
+
+rules:
+  # Ensure type is one of the allowed types
+  type-enum:
+    - 2
+    - always
+    - - feat      # New features
+      - fix       # Bug fixes
+      - docs      # Documentation changes
+      - style     # Code style changes (formatting, etc.)
+      - refactor  # Code refactoring
+      - perf      # Performance improvements
+      - test      # Test additions or changes
+      - chore     # Maintenance tasks
+      - security  # Security updates
+      - ci        # CI/CD changes
+      - build     # Build system changes
+      - revert    # Revert previous commits
+
+  # Subject should not be empty
+  subject-empty:
+    - 2
+    - never
+
+  # Subject should be in lowercase
+  subject-case:
+    - 2
+    - always
+    - - lower-case
+      - sentence-case
+
+  # Header should not exceed 100 characters
+  header-max-length:
+    - 2
+    - always
+    - 100
+
+  # Body should have a blank line before it
+  body-leading-blank:
+    - 2
+    - always
+
+  # Footer should have a blank line before it
+  footer-leading-blank:
+    - 2
+    - always
