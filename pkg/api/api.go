@@ -13,13 +13,15 @@ const tokenMissingMsg = "api token is empty or has not been set. exiting"
 // API is the http server responsible for serving the HTTP API endpoints
 type API struct {
 	Token       string
+	Port        int
 	hasHandlers bool
 }
 
 // New is a factory function creating a new API instance
-func New(token string) *API {
+func New(token string, port int) *API {
 	return &API{
 		Token:       token,
+		Port:        port,
 		hasHandlers: false,
 	}
 }
@@ -81,15 +83,16 @@ func (api *API) Start(block bool) error {
 	}
 
 	if block {
-		runHTTPServer()
+		api.runHTTPServer()
 	} else {
 		go func() {
-			runHTTPServer()
+			api.runHTTPServer()
 		}()
 	}
 	return nil
 }
 
-func runHTTPServer() {
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func (api *API) runHTTPServer() {
+	addr := fmt.Sprintf(":%d", api.Port)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }

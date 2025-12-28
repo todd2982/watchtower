@@ -174,6 +174,12 @@ func RegisterSystemFlags(rootCmd *cobra.Command) {
 			"Protect it like a password and rotate regularly. "+
 			"WARNING: Tokens are transmitted over HTTP (unencrypted) unless using a reverse proxy with HTTPS.")
 
+	flags.IntP(
+		"http-api-port",
+		"",
+		envInt("WATCHTOWER_HTTP_API_PORT"),
+		"Port for the HTTP API server to listen on (default: 8080)")
+
 	flags.BoolP(
 		"http-api-periodic-polls",
 		"",
@@ -434,6 +440,7 @@ func SetDefaults() {
 	viper.SetDefault("WATCHTOWER_NOTIFICATION_SLACK_IDENTIFIER", "watchtower")
 	viper.SetDefault("WATCHTOWER_LOG_LEVEL", "info")
 	viper.SetDefault("WATCHTOWER_LOG_FORMAT", "auto")
+	viper.SetDefault("WATCHTOWER_HTTP_API_PORT", 8080)
 }
 
 // EnvConfig translates the command-line options into environment variables
