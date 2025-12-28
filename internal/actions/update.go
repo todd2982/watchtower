@@ -214,7 +214,12 @@ func restartStaleContainer(container types.Container, client container.Client, p
 	// from re-using the same container name so we first rename the current
 	// instance so that the new one can adopt the old name.
 	if container.IsWatchtower() {
-		if err := client.RenameContainer(container, util.RandName()); err != nil {
+		randomName, err := util.RandName()
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
+		if err := client.RenameContainer(container, randomName); err != nil {
 			log.Error(err)
 			return nil
 		}
