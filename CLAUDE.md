@@ -163,6 +163,8 @@ Access the version using `internal/meta.Version` - do not hardcode version strin
 - **`.github/workflows/pull-request.yml`** - PR validation and testing
   - Runs tests on all platforms (Linux, macOS, Windows)
   - Builds binaries and Docker images locally (without publishing)
+  - Validates commit messages follow conventional commits format
+  - Generates and posts changelog preview as PR comment
 
 ### Release Process
 
@@ -207,6 +209,39 @@ docs: clarify --cleanup flag behavior in README
 ```
 
 Good commit messages help generate clear, user-friendly changelogs.
+
+### Commit Message Validation
+
+The project uses **commitlint** to enforce conventional commit message format:
+
+**Configuration:** `.commitlintrc.yml`
+
+**Validation:**
+
+- Automated validation runs on all pull requests via GitHub Actions
+- Checks commit messages follow conventional commits specification
+- Ensures proper type prefixes (feat, fix, docs, etc.)
+- Validates header length (max 100 characters)
+- Requires proper formatting (lowercase, blank lines)
+
+**Local validation (optional):**
+
+```bash
+# Install commitlint and config
+npm install --save-dev @commitlint/{cli,config-conventional}
+
+# Validate last commit
+npx commitlint --from HEAD~1 --to HEAD --verbose
+```
+
+**Changelog Preview:**
+
+Pull requests automatically receive a comment showing what the changelog will look like when the PR is merged. This preview:
+
+- Generates from commits in the PR compared to main branch
+- Shows how commits will be categorized in the release changelog
+- Updates automatically when new commits are pushed
+- Helps reviewers verify changelog quality before merging
 
 ## Testing Considerations
 
