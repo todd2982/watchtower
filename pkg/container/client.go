@@ -243,6 +243,11 @@ func (client dockerClient) GetNetworkConfig(c t.Container) *network.NetworkingCo
 		}
 
 		ep.Aliases = aliases
+
+		// Clear MacAddress to ensure compatibility with older Docker daemon API versions.
+		// Setting MAC address per network endpoint requires API version 1.44+.
+		// Docker will automatically assign MAC addresses when the container is created.
+		ep.MacAddress = ""
 	}
 	return config
 }
