@@ -885,6 +885,22 @@ var _ = Describe("the client", func() {
 				Expect(client.GetNetworkConfig(container).EndpointsConfig[`test`].Aliases).To(Equal([]string{"One", "Two", "Four"}))
 			})
 		})
+		When(`providing a container with MAC addresses`, func() {
+			It(`should clear MAC addresses for API compatibility`, func() {
+				client := dockerClient{
+					api:           docker,
+					ClientOptions: ClientOptions{IncludeRestarting: false},
+				}
+				container := MockContainer(WithImageName("docker.io/prefix/imagename:latest"))
+
+				endpoints := map[string]*network.EndpointSettings{
+					`test`: {MacAddress: "02:42:ac:11:00:02"},
+				}
+				container.containerInfo.NetworkSettings = &types.NetworkSettings{Networks: endpoints}
+				Expect(container.ContainerInfo().NetworkSettings.Networks[`test`].MacAddress).To(Equal("02:42:ac:11:00:02"))
+				Expect(client.GetNetworkConfig(container).EndpointsConfig[`test`].MacAddress).To(Equal(""))
+			})
+		})
 	})
 })
 
