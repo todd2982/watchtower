@@ -337,3 +337,111 @@ func TestFlagsArePrecentInDocumentation(t *testing.T) {
 		}
 	}
 }
+
+func TestProcessFlagAliasesInvalidCronExpression(t *testing.T) {
+	logrus.StandardLogger().ExitFunc = func(_ int) { panic(`FATAL`) }
+	cmd := new(cobra.Command)
+	SetDefaults()
+	RegisterDockerFlags(cmd)
+	RegisterSystemFlags(cmd)
+	RegisterNotificationFlags(cmd)
+
+	require.NoError(t, cmd.ParseFlags([]string{`--schedule`, `not a cron`}))
+	flags := cmd.Flags()
+
+	assert.PanicsWithValue(t, `FATAL`, func() {
+		ProcessFlagAliases(flags)
+	})
+}
+
+func TestProcessFlagAliasesInvalidFieldCount(t *testing.T) {
+	logrus.StandardLogger().ExitFunc = func(_ int) { panic(`FATAL`) }
+	cmd := new(cobra.Command)
+	SetDefaults()
+	RegisterDockerFlags(cmd)
+	RegisterSystemFlags(cmd)
+	RegisterNotificationFlags(cmd)
+
+	// 5-field cron expression (missing seconds field)
+	require.NoError(t, cmd.ParseFlags([]string{`--schedule`, `0 0 4 * *`}))
+	flags := cmd.Flags()
+
+	assert.PanicsWithValue(t, `FATAL`, func() {
+		ProcessFlagAliases(flags)
+	})
+}
+
+func TestProcessFlagAliasesValidCronExpression(t *testing.T) {
+	logrus.StandardLogger().ExitFunc = func(_ int) { t.FailNow() }
+	cmd := new(cobra.Command)
+	SetDefaults()
+	RegisterDockerFlags(cmd)
+	RegisterSystemFlags(cmd)
+	RegisterNotificationFlags(cmd)
+
+	// Valid 6-field cron expression (4 AM daily)
+	require.NoError(t, cmd.ParseFlags([]string{`--schedule`, `0 0 4 * * *`}))
+	flags := cmd.Flags()
+	ProcessFlagAliases(flags)
+
+	sched, _ := flags.GetString(`schedule`)
+	assert.Equal(t, `0 0 4 * * *`, sched)
+}
+
+func TestProcessFlagAliasesValidPredefined(t *testing.T) {
+	logrus.StandardLogger().ExitFunc = func(_ int) { t.FailNow() }
+	cmd := new(cobra.Command)
+	SetDefaults()
+	RegisterDockerFlags(cmd)
+	RegisterSystemFlags(cmd)
+	RegisterNotificationFlags(cmd)
+
+	// Test multiple predefined schedules
+	testCases := []string{`@daily`, `@hourly`, `@weekly`, `@monthly`, `@yearly`}
+
+	for _, scheduleSpec := range testCases {
+		t.Run(scheduleSpec, func(t *testing.T) {
+			cmd := new(cobra.Command)
+			SetDefaults()
+			RegisterDockerFlags(cmd)
+			RegisterSystemFlags(cmd)
+			RegisterNotificationFlags(cmd)
+
+			require.NoError(t, cmd.ParseFlags([]string{`--schedule`, scheduleSpec}))
+			flags := cmd.Flags()
+			ProcessFlagAliases(flags)
+
+			sched, _ := flags.GetString(`schedule`)
+			assert.Equal(t, scheduleSpec, sched)
+		})
+	}
+}
+
+func TestProcessFlagAliasesValidInterval(t *testing.T) {
+	logrus.StandardLogger().ExitFunc = func(_ int) { t.FailNow() }
+	cmd := new(cobra.Command)
+	SetDefaults()
+	RegisterDockerFlags(cmd)
+	RegisterSystemFlags(cmd)
+	RegisterNotificationFlags(cmd)
+
+	// Test @every interval expressions
+	testCases := []string{`@every 30s`, `@every 1h`, `@every 1h30m`}
+
+	for _, scheduleSpec := range testCases {
+		t.Run(scheduleSpec, func(t *testing.T) {
+			cmd := new(cobra.Command)
+			SetDefaults()
+			RegisterDockerFlags(cmd)
+			RegisterSystemFlags(cmd)
+			RegisterNotificationFlags(cmd)
+
+			require.NoError(t, cmd.ParseFlags([]string{`--schedule`, scheduleSpec}))
+			flags := cmd.Flags()
+			ProcessFlagAliases(flags)
+
+			sched, _ := flags.GetString(`schedule`)
+			assert.Equal(t, scheduleSpec, sched)
+		})
+	}
+}
