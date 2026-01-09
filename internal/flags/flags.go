@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -42,7 +43,7 @@ func RegisterSystemFlags(rootCmd *cobra.Command) {
 		"schedule",
 		"s",
 		envString("WATCHTOWER_SCHEDULE"),
-		"The cron expression which defines when to update")
+		"The cron expression which defines when to update (6-field format with seconds, e.g., '0 0 4 * * *' for 4 AM daily, or '@daily', '@every 1h')")
 
 	flags.DurationP(
 		"stop-timeout",
@@ -633,6 +634,12 @@ func ProcessFlagAliases(flags *pflag.FlagSet) {
 		_ = flags.Set(`schedule`, fmt.Sprintf(`@every %ds`, interval))
 	}
 
+	// Validate the final schedule expression
+	scheduleSpec, _ := flags.GetString("schedule")
+	if err := validateSchedule(scheduleSpec); err != nil {
+		log.Fatal(err)
+	}
+
 	if flagIsEnabled(flags, `debug`) {
 		_ = flags.Set(`log-level`, `debug`)
 	}
@@ -641,6 +648,30 @@ func ProcessFlagAliases(flags *pflag.FlagSet) {
 		_ = flags.Set(`log-level`, `trace`)
 	}
 
+}
+
+// validateSchedule validates a cron expression and returns a user-friendly error if invalid
+func validateSchedule(scheduleSpec string) error {
+	// Create a temporary scheduler with seconds support (same as runtime)
+	scheduler := cron.New(cron.WithSeconds())
+
+	// Try to parse the schedule expression
+	_, err := scheduler.AddFunc(scheduleSpec, func() {})
+
+	if err != nil {
+		return fmt.Errorf(`invalid cron expression: "%s"
+
+Valid formats:
+  - 6-field cron: "0 0 4 * * *" (4 AM daily, includes seconds)
+  - Predefined: @yearly, @monthly, @weekly, @daily, @hourly
+  - Intervals: @every <duration> (e.g., @every 1h30m)
+
+Documentation: https://pkg.go.dev/github.com/robfig/cron/v3
+
+Original error: %s`, scheduleSpec, err)
+	}
+
+	return nil
 }
 
 // SetupLogging reads only the flags that is needed to set up logging and applies them to the global logger
