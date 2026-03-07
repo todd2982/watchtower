@@ -50,12 +50,12 @@ jobs:
         with:
           go-version: 1.24.x
       - name: Login to Docker Hub
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef #v2
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 #v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: '~> v2'
           args: release --clean
