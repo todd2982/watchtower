@@ -1,0 +1,42 @@
+name: PR Tracker
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  add-to-project:
+    name: Add PR to project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add PR to Projects v2
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_ACCESS_TOKEN }}
+          PR_NODE_ID: ${{ github.event.pull_request.node_id }}
+        run: |
+          # Resolve the project's global node ID from its number
+          PROJECT_NODE_ID=$(gh api graphql -f query='
+            query {
+              user(login: "todd2982") {
+                projectV2(number: 2) {
+                  id
+                }
+              }
+            }
+          ' --jq '.data.user.projectV2.id')
+
+          echo "Project node ID: $PROJECT_NODE_ID"
+          echo "PR node ID:      $PR_NODE_ID"
+
+          # Add the PR to the project using its node_id from the event payload
+          gh api graphql -f query='
+            mutation($project: ID!, $pr: ID!) {
+              addProjectV2ItemById(input: { projectId: $project, contentId: $pr }) {
+                item { id }
+              }
+            }
+          ' -f project="$PROJECT_NODE_ID" -f pr="$PR_NODE_ID"
