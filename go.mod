@@ -1,6 +1,6 @@
 module github.com/todd2982/watchtower
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/containrrr/shoutrrr v0.8.0
@@ -73,7 +73,7 @@ require (
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.34.0
+	golang.org/x/text v0.35.0
 	golang.org/x/time v0.12.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
