@@ -17,7 +17,7 @@ updates:
           - "*"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
@@ -39,7 +39,7 @@ updates:
           - "patch"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
@@ -58,7 +58,7 @@ updates:
           - "*"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
@@ -77,7 +77,7 @@ updates:
           - "*"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
@@ -96,7 +96,7 @@ updates:
           - "*"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
@@ -115,7 +115,7 @@ updates:
           - "*"
     # Customize commit messages to follow conventional commits
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
     # Add labels for better organization
     labels:
