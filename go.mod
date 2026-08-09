@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/cli v29.6.2+incompatible
+	github.com/docker/cli v29.7.1+incompatible
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/docker/go-connections v0.8.1
 	github.com/moby/docker-image-spec v1.3.1
