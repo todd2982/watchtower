@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/cli v29.9.2+incompatible
+	github.com/docker/cli v29.9.3+incompatible
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/docker/go-connections v0.8.2
 	github.com/moby/docker-image-spec v1.3.1
@@ -15,7 +15,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.10.2
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 )
